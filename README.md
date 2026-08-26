@@ -1,21 +1,78 @@
-**Task Manager Application Overview:The task manager application is designed to help users efficiently manage their tasks and responsibilities by providing a user-friendly interface for creating, viewing, updating, and deleting tasks. It includes essential features such as secure user authentication, allowing individuals to sign up and log in to their accounts, as well as profile management to update personal information. With built-in validation such as input field validation and email validation, the application ensures a seamless user experience while enhancing productivity and organization in both personal and professional settings. **
+# IT Support Ticket System
 
-**This apps **contain** the following features:**
+## Overview
+An IT support ticket management system built for QUT IFN636 Assessment 1, adapted from the Tutorial 4 `taskmanagerv1` starter (Task domain → Ticket domain). It provides a user-friendly interface for submitting, viewing, and managing support tickets, with role-based access control distinguishing between EndUsers and Agents.
 
-* Signup
-* Login
-* Logout
-* Update profile
-* Add tasks
-* View tasks
-* Update tasks
-* Delete tasks
+## Features
+- Secure user authentication (signup, login, logout)
+- Profile management
+- Create, view, update, and delete support tickets
+- Role-based permissions:
+  - **EndUser** — can create tickets and edit the title/description of tickets they created
+  - **Agent** — can update ticket status, priority, and assignment on any ticket
 
-**This **app**lication** is**almost **a** precompiled** app**. However, students will develop some features,**such as adding tasks, viewing tasks, updating tasks, and **deleting** tasks**. **Students** will interact with GitHub when they develop the features.**
+## Architecture
+- **Frontend:** React
+- **Backend:** Node.js / Express
+- **Database:** MongoDB Atlas
+- **Auth:** JWT-based; a `role` field on the User model (`EndUser` / `Agent`) drives access control
+- **Structure:** Routes → Controllers → Models pattern
 
----
+## Setup (local development)
+### Prerequisites
+- [Node.js](https://nodejs.org/en)
+- [Git](https://git-scm.com/)
+- [VS Code](https://code.visualstudio.com/)
+- A [MongoDB Atlas](https://account.mongodb.com/account/login) account and database
+- A [GitHub](https://github.com/signup) account
 
-**Prerequisite:** Please install the following software and create account in following web tools** **
+### Steps
+1. Clone the repo:
+git clone https://github.com/172003/IT-Support-Ticket-System.git
+
+2. Backend setup:
+cd backend
+npm install
+
+3. Create a `.env` file in `backend/` (see `.env.example` for the required variables: `MONGO_URI`, `JWT_SECRET`, `PORT`).
+   
+4. Run the backend:
+node server.js
+
+5. Frontend setup (in a separate terminal):
+cd frontend
+npm install
+npm start
+
+
+## Deployment
+- Deployed on AWS EC2 — public URL: **[fill in after deployment]**
+- Manual deployment process (no CI/CD) — documented in [deployment section / link, to be added]
+
+## Known limitations
+- New users always register as `EndUser` by default; promoting a user to `Agent` currently requires manually updating the `role` field in the database (no admin UI yet)
+- [Add any other real limitations you're aware of]
+
+## Links
+- Jira: **[your link]**
+- Figma: **[your link]**
+- Draw.io: **[your link]**
+- GitHub: https://github.com/172003/IT-Support-Ticket-System
+
+
+## Deployment
+- Deployed on AWS EC2 — public URL: **[fill in after deployment]**
+- Manual deployment process (no CI/CD) — documented in [deployment section / link, to be added]
+
+## Known limitations
+- New users always register as `EndUser` by default; promoting a user to `Agent` currently requires manually updating the `role` field in the database (no admin UI yet)
+- [Add any other real limitations you're aware of]
+
+## Links
+- Jira: **[your link]**
+- Figma: **[your link]**
+- Draw.io: **[your link]**
+- GitHub: https://github.com/172003/IT-Support-Ticket-System
 
 * **Nodejs [**[https://nodejs.org/en](https://nodejs.org/en)]** **
 * **Git [**[https://git-scm.com/](https://git-scm.com/)]** **
