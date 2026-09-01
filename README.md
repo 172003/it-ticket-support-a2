@@ -57,10 +57,6 @@ npm start
 - Deployed on AWS EC2 — public URL: **[fill in after deployment]**
 - Manual deployment process (no CI/CD) — documented in [deployment section / link, to be added]
 
-## Known limitations
-- New users always register as `EndUser` by default; promoting a user to `Agent` currently requires manually updating the `role` field in the database (no admin UI yet)
-- [Add any other real limitations you're aware of]
-
 ## Links
 - Jira: https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog?selectedIssue=IT-10
 - Figma: https://www.figma.com/design/CFSlCjfvBAzWoseOXLUs4j/IT-ticket-support-system?node-id=0-1&p=f&t=11bEWEne38gfohxR-0
