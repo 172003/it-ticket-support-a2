@@ -53,13 +53,6 @@ npm start
 - New users always register as `EndUser` by default; promoting a user to `Agent` currently requires manually updating the `role` field in the database (no admin UI yet)
 - [Add any other real limitations you're aware of]
 
-## Links
-- Jira: **[your link]**
-- Figma: **[your link]**
-- Draw.io: **[your link]**
-- GitHub: https://github.com/172003/IT-Support-Ticket-System
-
-
 ## Deployment
 - Deployed on AWS EC2 — public URL: **[fill in after deployment]**
 - Manual deployment process (no CI/CD) — documented in [deployment section / link, to be added]
@@ -69,15 +62,14 @@ npm start
 - [Add any other real limitations you're aware of]
 
 ## Links
-- Jira: **[your link]**
-- Figma: **[your link]**
-- Draw.io: **[your link]**
+- Jira: https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog?selectedIssue=IT-10
+- Figma: https://www.figma.com/design/CFSlCjfvBAzWoseOXLUs4j/IT-ticket-support-system?node-id=0-1&p=f&t=11bEWEne38gfohxR-0
+- Draw.io: https://app.diagrams.net/#G1dorA9h5N7098G0jfVnnLCDAOLCwlI5Wv#%7B%22pageId%22%3A%22saCgywWLZkOcmtr4yVTn%22%7D
 - GitHub: https://github.com/172003/IT-Support-Ticket-System
 
 * **Nodejs [**[https://nodejs.org/en](https://nodejs.org/en)]** **
 * **Git [**[https://git-scm.com/](https://git-scm.com/)]** **
 * **VS code editor** [[https://code.visualstudio.com/](https://code.visualstudio.com/)]** **
-* **MongoDB Account** [[https://account.mongodb.com/account/login](https://account.mongodb.com/account/login)]** - In tutorial, we have also showed how can you create account and database: follow step number 2.**
+* **MongoDB Account**https://cloud.mongodb.com/v2/6a8b007290b1fa76c3339041#/security/database/users
 * **GitHub Account** [[https://github.com/signup?source=login](https://github.com/signup?source=login)]** **
 
----
