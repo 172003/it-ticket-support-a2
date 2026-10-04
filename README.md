@@ -1,67 +1,84 @@
-# IT Support Ticket System
+IT Ticket Support System
 
-## Overview
-An IT support ticket management system built for QUT IFN636 Assessment 1, adapted from the Tutorial 4 `taskmanagerv1` starter (Task domain → Ticket domain). It provides a user-friendly interface for submitting, viewing, and managing support tickets, with role-based access control distinguishing between EndUsers and Agents.
+A web application that gives CyberWave IT Support a central place to log, assign, track and resolve IT support requests, replacing scattered email and phone requests.
 
-## Features
-- Secure user authentication (signup, login, logout)
-- Profile management
-- Create, view, update, and delete support tickets
-- Role-based permissions:
-  - **EndUser** — can create tickets and edit the title/description of tickets they created
-  - **Agent** — can update ticket status, priority, and assignment on any ticket
+Built for QUT IFN636 Software Life Cycle Management (Assessment 2).
 
-## Architecture
-- **Frontend:** React
-- **Backend:** Node.js / Express
-- **Database:** MongoDB Atlas
-- **Auth:** JWT-based; a `role` field on the User model (`EndUser` / `Agent`) drives access control
-- **Structure:** Routes → Controllers → Models pattern
+Team: Mohika Manjunatha Rao, Thanathip Naphanang
 
-## Setup (local development)
-### Prerequisites
-- [Node.js](https://nodejs.org/en)
-- [Git](https://git-scm.com/)
-- [VS Code](https://code.visualstudio.com/)
-- A [MongoDB Atlas](https://account.mongodb.com/account/login) account and database
-- A [GitHub](https://github.com/signup) account
+Features
+ID	Feature	Status
+FR-01	End User creates a ticket (title, description, category, priority)	Baseline (A1)
+FR-02	End User views only their own tickets	Baseline (A1)
+FR-06	Only Agents can change status, priority and assignee	Baseline (A1)
+FR-07	End User closes or reopens their own ticket (reopen within 7 days of resolution)	New in A2
+FR-08	Comment thread on each ticket (End User who owns it, and Agents)	New in A2
 
-### Steps
-1. Clone the repo:
-git clone https://github.com/172003/IT-Support-Ticket-System.git
+Planned for a later release: agent self-assignment, resolution notes, field validation, keyword search and filtering, in-app notifications.
 
-2. Backend setup:
+Tech stack
+Frontend: React
+Backend: Node.js, Express, JWT authentication
+Database: MongoDB Atlas with Mongoose
+Testing: Mocha, Chai, Sinon (unit), Postman (API), Apache Benchmark (load)
+Deployment: AWS EC2 x2 (Nginx + PM2) behind an Application Load Balancer, CloudWatch monitoring
+CI/CD: GitHub Actions
+Design patterns and OOP
+State pattern (FR-07): backend/states/ticketStates.js holds one class per ticket status (OpenState, InProgressState, ResolvedState, ClosedState). Each class decides whether a close or reopen is allowed. Invalid actions throw InvalidTransitionError, which the API returns as HTTP 400.
+Chain of Responsibility (FR-08): backend/validators/commentChain.js validates a comment in order: ticket exists, user allowed, text length.
+Encapsulation: the controllers never set a ticket's status directly; they call close() or reopen() on the current state object.
+API endpoints
+Method	Endpoint	Description	Who
+POST	/api/auth/login	Log in and receive a JWT	Everyone
+POST	/api/tickets	Create a ticket	End User
+GET	/api/tickets	List tickets (own tickets for End Users, all for Agents)	Logged in
+PATCH	/api/tickets/:id/close	Close a Resolved ticket	Ticket owner
+PATCH	/api/tickets/:id/reopen	Reopen within 7 days of resolution	Ticket owner
+POST	/api/tickets/:id/comments	Add a comment (1 to 1000 characters)	Owner or Agent
+GET	/api/tickets/:id/comments	Read comments, oldest first	Owner or Agent
+GET	/api/health	Health check (used by the load balancer)	Public
+
+Common responses: 400 invalid action or input, 401 missing or invalid token, 403 not allowed, 404 ticket not found.
+
+Getting started
+Prerequisites
+Node.js 18 or later
+A MongoDB Atlas connection string
+Backend
+bash
 cd backend
 npm install
 
-3. Create a `.env` file in `backend/` (see `.env.example` for the required variables: `MONGO_URI`, `JWT_SECRET`, `PORT`).
-   
-4. Run the backend:
-node server.js
+Create backend/.env:
 
-5. Frontend setup (in a separate terminal):
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret
+PORT=5001
+bash
+npm start
+Frontend
+bash
 cd frontend
 npm install
 npm start
+Run the tests
+bash
+cd backend
+npm run test
 
+Never commit .env. It is listed in .gitignore.
 
-## Deployment
-- Deployed on AWS EC2 — public URL: **[fill in after deployment]**
-- Manual deployment process (no CI/CD) — documented in [deployment section / link, to be added]
+Deployment
 
-## Known limitations
-- New users always register as `EndUser` by default; promoting a user to `Agent` currently requires manually updating the `role` field in the database (no admin UI yet)
-- [Add any other real limitations you're aware of]
+Every push to main triggers GitHub Actions: the test job runs first, and the deploy job only runs if all tests pass. The app runs on two EC2 instances behind an Application Load Balancer, which health-checks /api/health.
 
-## Links
-- Jira: https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog?selectedIssue=IT-10
-- Figma: https://www.figma.com/design/CFSlCjfvBAzWoseOXLUs4j/IT-ticket-support-system?node-id=0-1&p=f&t=11bEWEne38gfohxR-0
-- Draw.io: https://app.diagrams.net/#G1dorA9h5N7098G0jfVnnLCDAOLCwlI5Wv#%7B%22pageId%22%3A%22saCgywWLZkOcmtr4yVTn%22%7D
-- GitHub: https://github.com/172003/IT-Support-Ticket-System
+Live URL: [ALB DNS name]
 
-* **Nodejs [**[https://nodejs.org/en](https://nodejs.org/en)]** **
-* **Git [**[https://git-scm.com/](https://git-scm.com/)]** **
-* **VS code editor** [[https://code.visualstudio.com/](https://code.visualstudio.com/)]** **
-* **MongoDB Account**https://cloud.mongodb.com/v2/6a8b007290b1fa76c3339041#/security/database/users
-* **GitHub Account** [[https://github.com/signup?source=login](https://github.com/signup?source=login)]** **
-
+Known limitations
+No auto-scaling (two instances are provisioned manually)
+Agent accounts are pre-seeded; there is no agent registration
+Comments cannot be edited or deleted
+Features listed under "planned" above are not implemented yet
+Project links
+Jira: https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog
+Repository: https://github.com/172003/it-ticket-support-a2
