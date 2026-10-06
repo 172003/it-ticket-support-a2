@@ -2,46 +2,50 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
-const TaskForm = ({ tasks, setTasks, editingTask, setEditingTask }) => {
+const EMPTY_FORM = { title: '', description: '', priority: 'Medium' };
+
+const TaskForm = ({ tickets, setTickets, editingTicket, setEditingTicket }) => {
   const { user } = useAuth();
-  const [formData, setFormData] = useState({ title: '', description: '', deadline: '' });
+  const [formData, setFormData] = useState(EMPTY_FORM);
 
   useEffect(() => {
-    if (editingTask) {
+    if (editingTicket) {
       setFormData({
-        title: editingTask.title,
-        description: editingTask.description,
-        deadline: editingTask.deadline,
+        title: editingTicket.title,
+        description: editingTicket.description || '',
+        priority: editingTicket.priority || 'Medium',
       });
     } else {
-      setFormData({ title: '', description: '', deadline: '' });
+      setFormData(EMPTY_FORM);
     }
-  }, [editingTask]);
+  }, [editingTicket]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const headers = { Authorization: `Bearer ${user.token}` };
     try {
-      if (editingTask) {
-        const response = await axiosInstance.put(`/api/tasks/${editingTask._id}`, formData, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        setTasks(tasks.map((task) => (task._id === response.data._id ? response.data : task)));
+      if (editingTicket) {
+        // End Users may only change title and description (the server rejects priority changes).
+        const response = await axiosInstance.put(
+          `/api/tickets/${editingTicket._id}`,
+          { title: formData.title, description: formData.description },
+          { headers }
+        );
+        setTickets(tickets.map((ticket) => (ticket._id === response.data._id ? response.data : ticket)));
       } else {
-        const response = await axiosInstance.post('/api/tasks', formData, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        setTasks([...tasks, response.data]);
+        const response = await axiosInstance.post('/api/tickets', formData, { headers });
+        setTickets([...tickets, response.data]);
       }
-      setEditingTask(null);
-      setFormData({ title: '', description: '', deadline: '' });
+      setEditingTicket(null);
+      setFormData(EMPTY_FORM);
     } catch (error) {
-      alert('Failed to save task.');
+      alert(error.response?.data?.message || 'Failed to save ticket.');
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
-      <h1 className="text-2xl font-bold mb-4">{editingTask ? 'Edit Task' : 'Add Task'}</h1>
+      <h1 className="text-2xl font-bold mb-4">{editingTicket ? 'Edit Ticket' : 'Add Ticket'}</h1>
       <input
         type="text"
         placeholder="Title"
@@ -56,14 +60,19 @@ const TaskForm = ({ tasks, setTasks, editingTask, setEditingTask }) => {
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         className="w-full mb-4 p-2 border rounded"
       />
-      <input
-        type="date"
-        value={formData.deadline}
-        onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-        className="w-full mb-4 p-2 border rounded"
-      />
+      {!editingTicket && (
+        <select
+          value={formData.priority}
+          onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+          className="w-full mb-4 p-2 border rounded"
+        >
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      )}
       <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-        {editingTask ? 'Update Task' : 'Add Task'}
+        {editingTicket ? 'Update Ticket' : 'Add Ticket'}
       </button>
     </form>
   );
