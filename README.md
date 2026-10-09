@@ -13,6 +13,7 @@ Built for QUT IFN636 Software Life Cycle Management (Assessment 2). The Assessme
 | FR-01 | A logged-in user creates a ticket (title, description, priority) |
 | FR-02 | A user sees only the tickets they created |
 | FR-06 | Only Agents can change status, priority and assignee; only the creator can edit title and description |
+| FR-08 | The ticket creator and Agents can post and read comments on a ticket (1-1000 characters, oldest first) |
 
 Work in progress is tracked in [Jira](https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog). Add a feature to this table in the pull request that delivers it.
 
@@ -44,8 +45,10 @@ Ticket endpoints require the header `Authorization: Bearer <token>`.
 | GET | `/api/tickets` | List the logged-in user's tickets | Logged in |
 | PUT | `/api/tickets/:id` | Update a ticket (role rules apply) | Owner or Agent |
 | DELETE | `/api/tickets/:id` | Delete a ticket | Logged in |
+| GET | `/api/tickets/:id/comments` | List the comments of a ticket, oldest first | Ticket owner or Agent |
+| POST | `/api/tickets/:id/comments` | Add a comment (`{ "text": "..." }`, 1-1000 characters) | Ticket owner or Agent |
 
-Common responses: 401 missing or invalid token, 403 not allowed, 404 ticket not found.
+Common responses: 401 missing or invalid token, 403 not allowed, 404 ticket not found, 400 invalid input (for the comment endpoints: invalid ticket id, or text that is not a string or not 1-1000 characters).
 
 ## Getting started
 
