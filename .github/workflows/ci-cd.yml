@@ -1,0 +1,97 @@
+# IT-72 / NFR-08: CI/CD pipeline for the IT Ticket Support System.
+# Pull request  -> test jobs only (nothing is deployed).
+# Push to main  -> test jobs, then deploy on the EC2 self-hosted runner.
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-test:
+    name: Backend Mocha tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20.x, 22.x]
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - name: Run Mocha tests
+        run: npx mocha --reporter spec | tee mocha-output.txt
+      - name: Keep the test output as evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mocha-output-node-${{ matrix.node }}
+          path: backend/mocha-output.txt
+
+  frontend-build:
+    name: Frontend production build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          CI: "false"
+
+  deploy:
+    name: Deploy to EC2
+    needs: [backend-test, frontend-build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          npm ci --prefix backend
+          npm ci --prefix frontend
+      - name: Build the frontend
+        run: npm run build --prefix frontend
+        env:
+          CI: "false"
+      - name: Write backend .env from secrets
+        run: |
+          cat > backend/.env <<ENV
+          MONGO_URI=${{ secrets.MONGO_URI }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          PORT=5001
+          ENV
+      - name: Restart the app with pm2
+        run: |
+          pm2 describe it-ticket >/dev/null 2>&1 \
+            && pm2 restart it-ticket --update-env \
+            || pm2 start npm --name it-ticket -- start
+          pm2 save
+      - name: Health check
+        run: |
+          sleep 5
+          curl --fail --silent --show-error http://localhost:5001/api/tickets \
+            -o /dev/null -w "%{http_code}\n" || [ $? -eq 22 ]
+          pm2 status
