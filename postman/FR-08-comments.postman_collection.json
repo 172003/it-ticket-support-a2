@@ -1,0 +1,253 @@
+{
+  "info": {
+    "name": "IT Ticket Support - FR-08 Comments (API-01 to API-07)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001"
+    },
+    {
+      "key": "ticketId",
+      "value": "PASTE_TICKET_ID"
+    },
+    {
+      "key": "ownerToken",
+      "value": "PASTE_TOKEN_OF_TICKET_OWNER"
+    },
+    {
+      "key": "otherToken",
+      "value": "PASTE_TOKEN_OF_ANOTHER_ENDUSER"
+    },
+    {
+      "key": "agentToken",
+      "value": "PASTE_TOKEN_OF_AGENT"
+    },
+    {
+      "key": "longText",
+      "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "item": [
+    {
+      "name": "API-01 POST comment as ticket owner (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('API-01 status is 201', () => pm.response.to.have.status(201));",
+              "pm.test('API-01 authorRole is EndUser', () => pm.expect(pm.response.json().authorRole).to.eql('EndUser'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{ownerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/tickets/{{ticketId}}/comments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"text\": \"Printer still not working\"}"
+        }
+      }
+    },
+    {
+      "name": "API-02 GET comments as ticket owner (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('API-02 status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('API-02 body is an array with at least one comment', () => { const b = pm.response.json(); pm.expect(b).to.be.an('array'); pm.expect(b.length).to.be.above(0); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{ownerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/tickets/{{ticketId}}/comments"
+      }
+    },
+    {
+      "name": "API-03 POST empty text (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('API-03 status is 400', () => pm.response.to.have.status(400));",
+              "pm.test('API-03 error message returned', () => pm.expect(pm.response.json().message).to.include('1-1000'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{ownerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/tickets/{{ticketId}}/comments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"text\": \"   \"}"
+        }
+      }
+    },
+    {
+      "name": "API-04 POST text over 1000 characters (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('API-04 status is 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{ownerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/tickets/{{ticketId}}/comments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"text\": \"{{longText}}\"}"
+        }
+      }
+    },
+    {
+      "name": "API-05 POST without token (401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('API-05 status is 401', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/tickets/{{ticketId}}/comments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"text\": \"No token\"}"
+        }
+      }
+    },
+    {
+      "name": "API-06 POST as another EndUser (403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('API-06 status is 403', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{otherToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/tickets/{{ticketId}}/comments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"text\": \"Not my ticket\"}"
+        }
+      }
+    },
+    {
+      "name": "API-07 POST on unknown ticket id (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('API-07 status is 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{agentToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/tickets/000000000000000000000000/comments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"text\": \"Ticket does not exist\"}"
+        }
+      }
+    }
+  ]
+}

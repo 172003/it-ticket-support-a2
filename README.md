@@ -1,67 +1,115 @@
-# IT Support Ticket System
+# IT Ticket Support System
 
-## Overview
-An IT support ticket management system built for QUT IFN636 Assessment 1, adapted from the Tutorial 4 `taskmanagerv1` starter (Task domain → Ticket domain). It provides a user-friendly interface for submitting, viewing, and managing support tickets, with role-based access control distinguishing between EndUsers and Agents.
+A web application that gives CyberWave IT Support a central place to log, assign, track and resolve IT support requests, replacing scattered email and phone requests.
+
+Built for QUT IFN636 Software Life Cycle Management (Assessment 2). The Assessment 1 version is preserved at tag `v1.0`.
+
+**Team:** Mohika Manjunatha Rao, Thanathip Naphanang
 
 ## Features
-- Secure user authentication (signup, login, logout)
-- Profile management
-- Create, view, update, and delete support tickets
-- Role-based permissions:
-  - **EndUser** — can create tickets and edit the title/description of tickets they created
-  - **Agent** — can update ticket status, priority, and assignment on any ticket
 
-## Architecture
+| ID | Feature |
+| --- | --- |
+| FR-01 | A logged-in user creates a ticket (title, description, priority) |
+| FR-02 | A user sees only the tickets they created |
+| FR-06 | Only Agents can change status, priority and assignee; only the creator can edit title and description |
+| FR-08 | The ticket creator and Agents can post and read comments on a ticket (1-1000 characters, oldest first) |
+
+Work in progress is tracked in [Jira](https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog). Add a feature to this table in the pull request that delivers it.
+
+## Roles
+
+- **EndUser**: creates tickets and edits the title and description of their own tickets.
+- **Agent**: changes the status, priority and assignee of any ticket.
+
+New accounts register as `EndUser`. An Agent account is created by changing the `role` field of the user in the database.
+
+## Tech stack
+
 - **Frontend:** React
-- **Backend:** Node.js / Express
-- **Database:** MongoDB Atlas
-- **Auth:** JWT-based; a `role` field on the User model (`EndUser` / `Agent`) drives access control
-- **Structure:** Routes → Controllers → Models pattern
+- **Backend:** Node.js, Express, JWT authentication
+- **Database:** MongoDB Atlas with Mongoose
+- **Testing:** Mocha, Chai, Sinon
 
-## Setup (local development)
+## API endpoints
+
+Ticket endpoints require the header `Authorization: Bearer <token>`.
+
+| Method | Endpoint | Description | Who |
+| --- | --- | --- | --- |
+| POST | `/api/auth/register` | Create an account | Everyone |
+| POST | `/api/auth/login` | Log in and receive a JWT | Everyone |
+| GET | `/api/auth/profile` | Get the logged-in user's profile | Logged in |
+| PUT | `/api/auth/profile` | Update the profile | Logged in |
+| POST | `/api/tickets` | Create a ticket | Logged in |
+| GET | `/api/tickets` | List the logged-in user's tickets | Logged in |
+| PUT | `/api/tickets/:id` | Update a ticket (role rules apply) | Owner or Agent |
+| DELETE | `/api/tickets/:id` | Delete a ticket | Logged in |
+| GET | `/api/tickets/:id/comments` | List the comments of a ticket, oldest first | Ticket owner or Agent |
+| POST | `/api/tickets/:id/comments` | Add a comment (`{ "text": "..." }`, 1-1000 characters) | Ticket owner or Agent |
+
+Common responses: 401 missing or invalid token, 403 not allowed, 404 ticket not found, 400 invalid input (for the comment endpoints: invalid ticket id, or text that is not a string or not 1-1000 characters).
+
+## Getting started
+
 ### Prerequisites
-- [Node.js](https://nodejs.org/en)
-- [Git](https://git-scm.com/)
-- [VS Code](https://code.visualstudio.com/)
-- A [MongoDB Atlas](https://account.mongodb.com/account/login) account and database
-- A [GitHub](https://github.com/signup) account
 
-### Steps
-1. Clone the repo:
-git clone https://github.com/172003/IT-Support-Ticket-System.git
+- Node.js 18 or later
+- A MongoDB Atlas connection string
 
-2. Backend setup:
+### Backend
+
+```bash
 cd backend
 npm install
+```
 
-3. Create a `.env` file in `backend/` (see `.env.example` for the required variables: `MONGO_URI`, `JWT_SECRET`, `PORT`).
-   
-4. Run the backend:
-node server.js
+Create `backend/.env`:
 
-5. Frontend setup (in a separate terminal):
+```
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret
+PORT=5001
+```
+
+```bash
+npm start
+```
+
+### Frontend
+
+```bash
 cd frontend
 npm install
 npm start
+```
 
+### Run the tests
 
-## Deployment
-- Deployed on AWS EC2 — public URL: **[fill in after deployment]**
-- Manual deployment process (no CI/CD) — documented in [deployment section / link, to be added]
+```bash
+cd backend
+npm run test
+```
+
+Never commit `.env`. It is listed in `.gitignore`.
+
+## Git workflow
+
+- Branch names: `<Jira-ID>-<short-description>`, for example `IT-66-comments`.
+- Commit messages: `<Jira-ID>: <description>`.
+- Every change reaches `main` through a pull request reviewed by the other member.
+- A pull request that adds a feature or an endpoint also updates this README.
 
 ## Known limitations
-- New users always register as `EndUser` by default; promoting a user to `Agent` currently requires manually updating the `role` field in the database (no admin UI yet)
-- [Add any other real limitations you're aware of]
 
-## Links
-- Jira: https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog?selectedIssue=IT-10
-- Figma: https://www.figma.com/design/CFSlCjfvBAzWoseOXLUs4j/IT-ticket-support-system?node-id=0-1&p=f&t=11bEWEne38gfohxR-0
-- Draw.io: https://app.diagrams.net/#G1dorA9h5N7098G0jfVnnLCDAOLCwlI5Wv#%7B%22pageId%22%3A%22saCgywWLZkOcmtr4yVTn%22%7D
-- GitHub: https://github.com/172003/IT-Support-Ticket-System
+- The frontend still uses the starter Task pages, so tickets cannot be used from the UI yet.
+- Agent accounts are created by changing the `role` field in the database; there is no agent registration.
+- Any logged-in user can delete any ticket; the delete endpoint has no ownership check.
+- The application is not deployed yet.
 
-* **Nodejs [**[https://nodejs.org/en](https://nodejs.org/en)]** **
-* **Git [**[https://git-scm.com/](https://git-scm.com/)]** **
-* **VS code editor** [[https://code.visualstudio.com/](https://code.visualstudio.com/)]** **
-* **MongoDB Account**https://cloud.mongodb.com/v2/6a8b007290b1fa76c3339041#/security/database/users
-* **GitHub Account** [[https://github.com/signup?source=login](https://github.com/signup?source=login)]** **
+## Project links
 
+- Jira: https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog
+- Repository: https://github.com/172003/it-ticket-support-a2
+Jira: https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog
+Repository: https://github.com/172003/it-ticket-support-a2
