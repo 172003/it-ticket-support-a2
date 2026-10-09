@@ -11,6 +11,9 @@ const STATUS_STYLES = {
 const TaskList = ({ tickets, setTickets, setEditingTicket }) => {
   const { user } = useAuth();
 
+  // Only the ticket owner may close or reopen (the server enforces this too).
+  const isOwner = (ticket) => String(ticket.createdBy?._id ?? ticket.createdBy) === String(user.id);
+
   const authHeaders = () => ({ headers: { Authorization: `Bearer ${user.token}` } });
 
   const handleDelete = async (ticketId) => {
@@ -58,7 +61,7 @@ const TaskList = ({ tickets, setTickets, setEditingTicket }) => {
             >
               Edit
             </button>
-            {ticket.status === 'Resolved' && (
+            {isOwner(ticket) && ticket.status === 'Resolved' && (
               <button
                 onClick={() => changeState(ticket._id, 'close')}
                 className="mr-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
@@ -66,7 +69,7 @@ const TaskList = ({ tickets, setTickets, setEditingTicket }) => {
                 Close
               </button>
             )}
-            {(ticket.status === 'Resolved' || ticket.status === 'Closed') && (
+            {isOwner(ticket) && (ticket.status === 'Resolved' || ticket.status === 'Closed') && (
               <button
                 onClick={() => changeState(ticket._id, 'reopen')}
                 className="mr-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
