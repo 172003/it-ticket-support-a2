@@ -101,4 +101,26 @@ describe('FR-08 Comment thread - addComment', () => {
     expect(res.status.calledWith(404)).to.equal(true);
     expect(createStub.notCalled).to.equal(true);
   });
+
+  // Checks ContentHandler rejects non-string text instead of crashing with 500.
+  it('TC-13: non-string comment text returns 400', async () => {
+    const ticketId = new mongoose.Types.ObjectId();
+    const userId = new mongoose.Types.ObjectId();
+    sinon.stub(Ticket, 'findById').resolves({ _id: ticketId, createdBy: userId });
+    const createStub = sinon.stub(Comment, 'create');
+    const req = {
+      params: { id: ticketId.toString() },
+      body: { text: 123 },
+      user: { _id: userId, role: 'EndUser' },
+    };
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.spy(),
+    };
+
+    await addComment(req, res);
+
+    expect(res.status.calledWith(400)).to.equal(true);
+    expect(createStub.notCalled).to.equal(true);
+  });
 });
