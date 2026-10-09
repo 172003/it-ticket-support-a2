@@ -31,10 +31,11 @@ class AccessHandler extends Handler {
   }
 }
 
-// 400 unless the text has 1 to 1000 characters after trimming
+// 400 unless the text is a string with 1 to 1000 characters after trimming
 class ContentHandler extends Handler {
   handle(ctx) {
-    const length = (ctx.text || '').trim().length;
+    if (typeof ctx.text !== 'string') return { status: 400, message: 'Comment text must be a string' };
+    const length = ctx.text.trim().length;
     if (length < 1 || length > 1000) return { status: 400, message: 'Comment must be 1-1000 characters' };
     return super.handle(ctx);
   }
