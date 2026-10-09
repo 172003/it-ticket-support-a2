@@ -4,6 +4,9 @@ const express = require('express');
 // Import the ticket functions from ticketController.js
 const { getTickets, addTicket, updateTicket, deleteTicket, closeTicket, reopenTicket } = require('../controllers/ticketController');
 
+// Import the two comment functions (FR-08)
+const { addComment, getComments } = require('../controllers/commentController');
+
 // Import the 'protect' function, which checks the user is logged in before allowing access
 const { protect } = require('../middleware/authMiddleware');
 
@@ -25,6 +28,9 @@ router.patch('/:id/reopen', protect, reopenTicket);
 // PUT request -> check login, then update that ticket
 // DELETE request -> check login, then delete that ticket
 router.route('/:id').put(protect, updateTicket).delete(protect, deleteTicket);
+
+// Comments on a ticket: GET returns them oldest first, POST adds one
+router.route('/:id/comments').get(protect, getComments).post(protect, addComment);
 
 // Make this router available for server.js to use
 module.exports = router;
