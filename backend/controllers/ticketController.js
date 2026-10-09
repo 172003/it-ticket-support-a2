@@ -45,8 +45,11 @@ const updateTicket = async (req, res) => {
     ticket.description = description || ticket.description;
     if (status !== undefined || priority !== undefined || assignedTo !== undefined) {
       if (req.user.role === 'Agent') {
-        // FR-07: remember when the ticket became Resolved (used for the 7-day reopen rule)
+        // FR-07: remember when the ticket was resolved (used for the 7-day reopen rule).
+        // A ticket an Agent closes directly also needs a date, or it could never be reopened.
         if (status === 'Resolved' && ticket.status !== 'Resolved') {
+          ticket.resolvedAt = new Date();
+        } else if (status === 'Closed' && !ticket.resolvedAt) {
           ticket.resolvedAt = new Date();
         }
         ticket.status = status ?? ticket.status;
