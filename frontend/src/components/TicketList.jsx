@@ -8,7 +8,7 @@ const STATUS_STYLES = {
   'Closed': 'bg-gray-300 text-gray-800',
 };
 
-const TaskList = ({ tickets, setTickets, setEditingTicket }) => {
+const TicketList = ({ tickets, setTickets, setEditingTicket }) => {
   const { user } = useAuth();
 
   // Only the ticket owner may close or reopen (the server enforces this too).
@@ -38,7 +38,7 @@ const TaskList = ({ tickets, setTickets, setEditingTicket }) => {
 
   return (
     <div>
-      {tickets.length === 0 && <p className="text-gray-500">No tickets yet.</p>}
+      {tickets.length === 0 && <p className="text-gray-500">{user.role === 'Agent' ? 'No tickets have been created yet.' : 'You have not created any tickets yet.'}</p>}
       {tickets.map((ticket) => (
         <div key={ticket._id} className="bg-gray-100 p-4 mb-4 rounded shadow">
           <div className="flex justify-between items-start">
@@ -49,6 +49,9 @@ const TaskList = ({ tickets, setTickets, setEditingTicket }) => {
           </div>
           <p>{ticket.description}</p>
           <p className="text-sm text-gray-500">Priority: {ticket.priority}</p>
+          {user.role === 'Agent' && ticket.createdBy?.name && (
+            <p className="text-sm text-gray-500">Created by: {ticket.createdBy.name}</p>
+          )}
           {ticket.resolvedAt && (
             <p className="text-sm text-gray-500">
               Resolved on: {new Date(ticket.resolvedAt).toLocaleDateString()}
@@ -90,4 +93,4 @@ const TaskList = ({ tickets, setTickets, setEditingTicket }) => {
   );
 };
 
-export default TaskList;
+export default TicketList;

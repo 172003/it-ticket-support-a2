@@ -5,10 +5,11 @@ const Ticket = require('../models/Ticket');
 const { stateFor } = require('../states/ticketStates');
 const InvalidTransitionError = require('../errors/InvalidTransitionError');
 
-// GET all tickets - returns tickets created by the logged-in user
+// GET all tickets - an Agent sees every ticket, an End User sees only their own
 const getTickets = async (req, res) => {
   try {
-    const tickets = await Ticket.find({ createdBy: req.user.id });
+    const filter = req.user.role === 'Agent' ? {} : { createdBy: req.user.id };
+    const tickets = await Ticket.find(filter).populate('createdBy', 'name email').sort({ createdAt: -1 });
     res.json(tickets);
   } catch (error) {
     res.status(500).json({ message: error.message });
