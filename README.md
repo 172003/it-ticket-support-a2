@@ -13,6 +13,7 @@ Built for QUT IFN636 Software Life Cycle Management (Assessment 2). The Assessme
 | FR-01 | A logged-in user creates a ticket (title, description, priority) |
 | FR-02 | A user sees only the tickets they created |
 | FR-06 | Only Agents can change status, priority and assignee; only the creator can edit title and description |
+| FR=07 | The ticket creator closes a Resolved ticket, or reopens a Resolved or Closed ticket within 7 days of resolution |
 | FR-08 | The ticket creator and Agents can post and read comments on a ticket (1-1000 characters, oldest first) |
 
 Work in progress is tracked in [Jira](https://mohikaqut.atlassian.net/jira/software/projects/IT/boards/5/backlog). Add a feature to this table in the pull request that delivers it.
