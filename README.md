@@ -22,7 +22,7 @@ Work in progress is tracked in [Jira](https://mohikaqut.atlassian.net/jira/softw
 - **EndUser**: creates tickets and edits the title and description of their own tickets.
 - **Agent**: changes the status, priority and assignee of any ticket.
 
-New accounts register as `EndUser`. An Agent account is created by changing the `role` field of the user in the database.
+New accounts register as `EndUser`. An Agent account is created with `npm run seed` (run from `backend`). Set `SEED_AGENT_PASSWORD` in `backend/.env` first (`SEED_AGENT_EMAIL` is optional and defaults to `agent@example.com`). The password is never printed. If the user already exists, the seed only sets the role to Agent and keeps the existing password.
 
 ## Tech stack
 
@@ -42,7 +42,7 @@ Ticket endpoints require the header `Authorization: Bearer <token>`.
 | GET | `/api/auth/profile` | Get the logged-in user's profile | Logged in |
 | PUT | `/api/auth/profile` | Update the profile | Logged in |
 | POST | `/api/tickets` | Create a ticket | Logged in |
-| GET | `/api/tickets` | List the logged-in user's tickets | Logged in |
+| GET | `/api/tickets` | List tickets: an End User gets their own tickets, an Agent gets all tickets (newest first) | Logged in |
 | PUT | `/api/tickets/:id` | Update a ticket (role rules apply) | Owner or Agent |
 | DELETE | `/api/tickets/:id` | Delete a ticket | Logged in |
 | GET | `/api/tickets/:id/comments` | List the comments of a ticket, oldest first | Ticket owner or Agent |
