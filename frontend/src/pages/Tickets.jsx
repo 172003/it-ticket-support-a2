@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../axiosConfig';
-import TaskForm from '../components/TaskForm';
-import TaskList from '../components/TaskList';
+import TicketForm from '../components/TicketForm';
+import TicketList from '../components/TicketList';
 import { useAuth } from '../context/AuthContext';
 
-const Tasks = () => {
+const Tickets = () => {
   const { user } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [editingTicket, setEditingTicket] = useState(null);
@@ -36,15 +36,15 @@ const Tasks = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <TaskForm
+      <TicketForm
         tickets={tickets}
         setTickets={setTickets}
         editingTicket={editingTicket}
         setEditingTicket={setEditingTicket}
       />
-      <TaskList tickets={tickets} setTickets={setTickets} setEditingTicket={setEditingTicket} />
+      <TicketList tickets={tickets} setTickets={setTickets} setEditingTicket={setEditingTicket} />
     </div>
   );
 };
 
-export default Tasks;
+export default Tickets;

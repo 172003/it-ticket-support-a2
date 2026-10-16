@@ -7,6 +7,7 @@
     "test": "mocha",
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "seed": "node seedAgent.js",
     "prod": "node server.js"
   },
   "dependencies": {

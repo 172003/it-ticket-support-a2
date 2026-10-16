@@ -4,7 +4,7 @@ import axiosInstance from '../axiosConfig';
 
 const EMPTY_FORM = { title: '', description: '', priority: 'Medium' };
 
-const TaskForm = ({ tickets, setTickets, editingTicket, setEditingTicket }) => {
+const TicketForm = ({ tickets, setTickets, editingTicket, setEditingTicket }) => {
   const { user } = useAuth();
   const [formData, setFormData] = useState(EMPTY_FORM);
 
@@ -22,6 +22,7 @@ const TaskForm = ({ tickets, setTickets, editingTicket, setEditingTicket }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.title.trim()) return alert('Title is required.');
     const headers = { Authorization: `Bearer ${user.token}` };
     try {
       if (editingTicket) {
@@ -45,16 +46,17 @@ const TaskForm = ({ tickets, setTickets, editingTicket, setEditingTicket }) => {
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
-      <h1 className="text-2xl font-bold mb-4">{editingTicket ? 'Edit Ticket' : 'Add Ticket'}</h1>
+      <h1 className="text-2xl font-bold mb-4">{editingTicket ? 'Edit Ticket' : 'Create Ticket'}</h1>
       <input
         type="text"
         placeholder="Title"
+        required
         value={formData.title}
         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         className="w-full mb-4 p-2 border rounded"
       />
-      <input
-        type="text"
+      <textarea
+        rows={3}
         placeholder="Description"
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -78,4 +80,4 @@ const TaskForm = ({ tickets, setTickets, editingTicket, setEditingTicket }) => {
   );
 };
 
-export default TaskForm;
+export default TicketForm;
