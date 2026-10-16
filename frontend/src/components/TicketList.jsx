@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
+import CommentThread from './CommentThread';
 
 const STATUS_STYLES = {
   'Open': 'bg-blue-100 text-blue-800',
@@ -10,6 +12,7 @@ const STATUS_STYLES = {
 
 const TicketList = ({ tickets, setTickets, setEditingTicket }) => {
   const { user } = useAuth();
+  const [openCommentsId, setOpenCommentsId] = useState(null); // FR-08: which ticket's comments are shown
 
   // Only the ticket owner may close or reopen (the server enforces this too).
   const isOwner = (ticket) => String(ticket.createdBy?._id ?? ticket.createdBy) === String(user.id);
@@ -64,6 +67,12 @@ const TicketList = ({ tickets, setTickets, setEditingTicket }) => {
             >
               Edit
             </button>
+            <button
+              onClick={() => setOpenCommentsId(openCommentsId === ticket._id ? null : ticket._id)}
+              className="mr-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            >
+              {openCommentsId === ticket._id ? 'Hide comments' : 'Comments'}
+            </button>
             {isOwner(ticket) && ticket.status === 'Resolved' && (
               <button
                 onClick={() => changeState(ticket._id, 'close')}
@@ -87,6 +96,7 @@ const TicketList = ({ tickets, setTickets, setEditingTicket }) => {
               Delete
             </button>
           </div>
+          {openCommentsId === ticket._id && <CommentThread ticketId={ticket._id} />}
         </div>
       ))}
     </div>
