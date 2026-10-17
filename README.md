@@ -24,6 +24,22 @@ Work in progress is tracked in [Jira](https://mohikaqut.atlassian.net/jira/softw
 
 New accounts register as `EndUser`. An Agent account is created with `npm run seed` (run from `backend`). Set `SEED_AGENT_PASSWORD` in `backend/.env` first (`SEED_AGENT_EMAIL` is optional and defaults to `agent@example.com`). The password is never printed. If the user already exists, the seed only sets the role to Agent and keeps the existing password.
 
+## Role-based permissions (IT-83, NFR-06)
+
+| Action | End User | Agent |
+|---|---|---|
+| View tickets | Own only | All |
+| Create ticket | Yes | No (403) |
+| Edit title / description | Own only | No (403) |
+| Delete ticket | Own only | No (403) |
+| Change status, priority, assignee | No (403) | Yes |
+| Comment (FR-08) | Own tickets | Any ticket |
+| Close / reopen (FR-07) | Own tickets | No (403) |
+
+Rules are implemented with the Strategy pattern in `backend/policies/ticketPolicies.js`
+(one policy class per role). Requests without a valid token get 401 from `protect`.
+Tests: TC-20 to TC-35 (`cd backend && npm test`).
+
 ## Tech stack
 
 - **Frontend:** React
