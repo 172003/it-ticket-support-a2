@@ -44,6 +44,7 @@ const TicketForm = ({ tickets, setTickets, editingTicket, setEditingTicket }) =>
     }
   };
 
+  if (user?.role === 'Agent') return null;
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
       <h1 className="text-2xl font-bold mb-4">{editingTicket ? 'Edit Ticket' : 'Create Ticket'}</h1>
