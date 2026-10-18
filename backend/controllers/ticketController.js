@@ -48,9 +48,9 @@ const updateTicket = async (req, res) => {
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
     const policy = policyFor(req.user);
-    if (!policy.canView(ticket, req.user)) {
-      return res.status(403).json({ message: 'You can only edit tickets you created' });
-    }
+    if (!policy.canAccess(ticket, req.user)) {
+    return res.status(403).json({ message: 'You do not have access to this ticket' });
+      }
 
     const changesContent = differs(title, ticket.title) || differs(description, ticket.description);
     const changesHandling =
@@ -116,7 +116,7 @@ const changeTicketState = (action) => async (req, res) => {
       return res.status(403).json({ message: `Only the ticket owner can ${action} this ticket` });
     }
 
-    stateFor(ticket)[action]();          
+           stateFor(ticket)[action]();             
     const savedTicket = await ticket.save();
     res.status(200).json(savedTicket);
   } catch (error) {
